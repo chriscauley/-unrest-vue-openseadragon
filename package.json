@@ -2,6 +2,9 @@
   "name": "@unrest/vue-openseadragon",
   "license": "MIT",
   "version": "0.0.2",
+  "repository": "https://github.com/chriscauley/unrest-vue-openseadragon",
+  "author": "chriscauley",
+  "keywords": ["vue", "openseadragon"],
   "scripts": {
     "build": "vite build",
     "dev": "vite",
