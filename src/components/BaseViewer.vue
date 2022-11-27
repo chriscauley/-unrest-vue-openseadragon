@@ -36,11 +36,11 @@ export default {
         dblClickToZoom: false,
       },
     }
-    return { osd_options }
+    return { osd_options, viewer: null }
   },
   watch: {
     editor_mode() {
-      const { viewer } = this.osd_store
+      const { viewer } = this
       viewer.setMouseNavEnabled(!this.editor_mode)
       viewer.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4
     },
@@ -51,7 +51,7 @@ export default {
         return
       }
       // Loosely adapted from Openseadragon.Viewer's onCanvasDragEnd onCanvasScroll
-      const viewer = this.osd_store.viewer
+      const { viewer } = this
       const viewport = viewer.viewport
       if (event.ctrlKey) {
         const box = viewer.container.getBoundingClientRect()
@@ -68,7 +68,8 @@ export default {
       viewport.applyConstraints()
     },
     callback(viewer) {
-      this.osd_store.bindViewer(viewer)
+      this.viewer = viewer
+      this.osd_store?.bindViewer(viewer)
       this.$emit('viewer-bound', viewer)
     },
   },
