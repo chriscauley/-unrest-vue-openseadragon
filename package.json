@@ -1,0 +1,26 @@
+{
+  "name": "doot",
+  "license": "MIT",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@unrest/vue-mousetrap": "^0.0.12",
+    "openseadragon": "^2.4.2",
+    "vue": "^3.2.41"
+  },
+  "devDependencies": {
+    "@unrest/vue-mousetrap": "^0.0.12",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "autoprefixer": "^10.4.13",
+    "openseadragon": "^2.4.2",
+    "postcss": "^8.4.19",
+    "tailwindcss": "^3.2.4",
+    "vite": "^3.2.3",
+    "vue": "^3.2.41"
+  }
+}

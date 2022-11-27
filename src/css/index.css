@@ -1,0 +1,9 @@
+@import './tailwind.css';
+
+body {
+  margin: 0;
+}
+
+html, body, #app, #openseadragon-viewer {
+  height: 100%;
+}
