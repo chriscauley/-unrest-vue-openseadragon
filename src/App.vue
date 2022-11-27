@@ -26,9 +26,9 @@ export default {
       const url = corner
       const corners = [
         [0, 0, 0],
-        [0, y_max-1, 270],
-        [x_max-1, y_max-1, 180],
-        [x_max-1, 0, 90],
+        [0, y_max - 1, 270],
+        [x_max - 1, y_max - 1, 180],
+        [x_max - 1, 0, 90],
       ]
       corners.forEach(([x, y, degrees]) => {
         this.osd_store.viewer.addSimpleImage({ url, x, y, width: 1, opacity: 1, degrees })
@@ -40,7 +40,7 @@ export default {
     },
     syncImages() {
       images.forEach(([url, x, y]) => {
-        const [width, height] = url.split('/').pop().split('x').map(Number)
+        const [width, _height] = url.split('/').pop().split('x').map(Number)
         const { _contentSize } = this.osd_store.viewer.world
         this.osd_store.viewer.addSimpleImage({
           url,
@@ -50,7 +50,7 @@ export default {
         })
       })
       this.osd_store.viewer.viewport.fitBounds(new Rect(0, 0, x_max, y_max), true)
-    }
-  }
+    },
+  },
 }
 </script>

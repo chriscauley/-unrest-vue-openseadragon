@@ -1,21 +1,62 @@
-import l from "openseadragon";
-import { resolveComponent as u, openBlock as c, createBlock as g, withModifiers as w, createElementBlock as _, renderSlot as v, reactive as x, markRaw as f, normalizeStyle as d, createVNode as z, createCommentVNode as y, createElementVNode as b } from "vue";
+import i from "openseadragon";
+import { openBlock as a, createElementBlock as m, resolveComponent as u, createBlock as w, withModifiers as v, renderSlot as g, reactive as f, markRaw as x, normalizeStyle as h, createVNode as b, createCommentVNode as z, createElementVNode as y } from "vue";
 import Z from "@unrest/vue-mousetrap";
-const m = (o, e) => {
-  const t = o.__vccOpts || o;
-  for (const [s, r] of e)
-    t[s] = r;
+const d = (e, o) => {
+  const t = e.__vccOpts || e;
+  for (const [n, s] of o)
+    t[n] = s;
   return t;
 }, $ = {
   props: {
-    osd_store: Object
+    id: {
+      type: String,
+      default: "openseadragon-viewer"
+    },
+    options: Object,
+    events: Object,
+    pixelated: Boolean
   },
   emits: ["viewer-bound"],
   data() {
-    var t;
-    const o = !!((t = this.$auth.user) != null && t.is_superuser);
+    return { viewer: null };
+  },
+  mounted() {
+    const { ...e } = this.options;
+    e.element = this.$el, window.viewer_jawn = this.viewer = new i(e);
+    const { viewport: o } = this.viewer;
+    o.centerSpringY.animationTime = 0.25, o.centerSpringX.animationTime = 0.25, o.zoomSpring.animationTime = 0.25, this.bindEvents(), this.$emit("viewer-bound", this.viewer);
+    const t = () => {
+      if (this.pixelated) {
+        const { drawer: n, viewport: s } = this.viewer;
+        n.context.imageSmoothingEnabled = s.getZoom() < 0.5;
+      }
+    };
+    this.viewer.addHandler("zoom", t), this.viewer.addOnceHandler("tile-loaded", t);
+  },
+  methods: {
+    bindEvents() {
+      const { events: e = {}, viewer: o } = this;
+      Object.entries(e).forEach(([t, n]) => o.addHandler(t, n));
+    }
+  }
+}, O = ["id"];
+function C(e, o, t, n, s, r) {
+  return a(), m("div", {
+    id: t.id,
+    class: "osd-wrapper"
+  }, null, 8, O);
+}
+const k = /* @__PURE__ */ d($, [["render", C]]), B = {
+  components: { OpenSeadragon: k },
+  props: {
+    osd_store: Object,
+    editor_mode: Boolean
+  },
+  emits: ["viewer-bound"],
+  data() {
+    const { editor_mode: e } = this;
     return { osd_options: {
-      maxZoomPixelRatio: o ? 8 : 4,
+      maxZoomPixelRatio: e ? 8 : 4,
       navigatorAutoFade: !1,
       showNavigator: !0,
       showZoomControl: !1,
@@ -24,84 +65,78 @@ const m = (o, e) => {
       showRotationControl: !1,
       debugmode: !1,
       clickTimeThreshold: 1e3,
-      mouseNavEnabled: !o,
+      mouseNavEnabled: !e,
       gestureSettingsMouse: {
         clickToZoom: !1,
         dblClickToZoom: !1
       }
     } };
   },
-  computed: {
-    is_editor() {
-      var o;
-      return !!((o = this.$auth.user) != null && o.is_superuser);
-    }
-  },
   watch: {
-    is_editor() {
-      const { viewer: o } = this.osd_store;
-      o.setMouseNavEnabled(!this.is_editor), o.viewport.maxZoomPixelRatio = this.is_editor ? 8 : 4;
+    editor_mode() {
+      const { viewer: e } = this.osd_store;
+      e.setMouseNavEnabled(!this.editor_mode), e.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4;
     }
   },
   methods: {
-    osdWheel(o) {
-      if (!this.is_editor)
+    osdWheel(e) {
+      if (!this.editor_mode)
         return;
-      const e = this.osd_store.viewer, t = e.viewport;
-      if (o.ctrlKey) {
-        const s = e.container.getBoundingClientRect(), r = new l.Point(o.pageX - s.left, o.pageY - s.top), n = Math.pow(e.zoomPerScroll, -o.deltaY / 20);
-        t.zoomBy(n, t.pointFromPixel(r, !0));
+      const o = this.osd_store.viewer, t = o.viewport;
+      if (e.ctrlKey) {
+        const n = o.container.getBoundingClientRect(), s = new i.Point(e.pageX - n.left, e.pageY - n.top), r = Math.pow(o.zoomPerScroll, -e.deltaY / 20);
+        t.zoomBy(r, t.pointFromPixel(s, !0));
       } else {
-        const s = t.pixelFromPoint(t.getCenter(!0)), r = t.pointFromPixel(
-          new l.Point(s.x + 3 * o.deltaX, s.y + 3 * o.deltaY)
+        const n = t.pixelFromPoint(t.getCenter(!0)), s = t.pointFromPixel(
+          new i.Point(n.x + 3 * e.deltaX, n.y + 3 * e.deltaY)
         );
-        t.panTo(r, !1);
+        t.panTo(s, !1);
       }
       t.applyConstraints();
     },
-    callback(o) {
-      this.osd_store.bindViewer(o), this.$emit("viewer-bound", o);
+    callback(e) {
+      this.osd_store.bindViewer(e), this.$emit("viewer-bound", e);
     }
   }
 };
-function k(o, e, t, s, r, n) {
-  const i = u("open-seadragon");
-  return c(), g(i, {
-    onMousewheel: w(n.osdWheel, ["prevent"]),
-    options: r.osd_options,
-    callback: n.callback,
+function M(e, o, t, n, s, r) {
+  const l = u("open-seadragon");
+  return a(), w(l, {
+    onMousewheel: v(r.osdWheel, ["prevent"]),
+    options: s.osd_options,
+    onViewerBound: r.callback,
     pixelated: !0
-  }, null, 8, ["onMousewheel", "options", "callback"]);
+  }, null, 8, ["onMousewheel", "options", "onViewerBound"]);
 }
-const C = /* @__PURE__ */ m($, [["render", k]]), O = {
+const S = /* @__PURE__ */ d(B, [["render", M]]), H = {
   props: {
     viewer: Object
   },
   mounted() {
-    this.viewer.addOverlay(this.$el, new l.Rect(0, 0, 1, 1));
+    this.viewer.addOverlay(this.$el, new i.Rect(0, 0, 1, 1));
   }
-}, M = { class: "osd-html__overlay" };
-function P(o, e, t, s, r, n) {
-  return c(), _("div", M, [
-    v(o.$slots, "default")
+}, P = { class: "osd-html__overlay" };
+function T(e, o, t, n, s, r) {
+  return a(), m("div", P, [
+    g(e.$slots, "default")
   ]);
 }
-const h = /* @__PURE__ */ m(O, [["render", P]]), B = () => {
-  const o = x({ _viewer: null });
+const p = /* @__PURE__ */ d(H, [["render", T]]), V = () => {
+  const e = f({ _viewer: null });
   return {
-    state: o,
-    patch: (e) => Object.assign(o, e),
+    state: e,
+    patch: (o) => Object.assign(e, o),
     get viewer() {
-      return o._viewer;
+      return e._viewer;
     },
-    set viewer(e) {
-      o._viewer = e && f(e);
+    set viewer(o) {
+      e._viewer = o && x(o);
     },
-    bindViewer(e) {
-      o._viewer = e, e.addHandler("zoom", () => o.zoom = e.viewport.getZoom());
+    bindViewer(o) {
+      e._viewer = o, o.addHandler("zoom", () => e.zoom = o.viewport.getZoom());
     }
   };
-}, R = (o, e, t) => Math.min(t, Math.max(o, e)), a = [0, 0.5, 1, 2, 3, 4], V = {
+}, j = (e, o, t) => Math.min(t, Math.max(e, o)), c = [0, 0.5, 1, 2, 3, 4], E = {
   mixins: [Z.Mixin],
   props: {
     viewer: Object
@@ -111,8 +146,8 @@ const h = /* @__PURE__ */ m(O, [["render", P]]), B = () => {
   },
   computed: {
     wrapper_style() {
-      const { height: o, width: e } = this.viewer.navigator.element.getBoundingClientRect();
-      return { right: `${e}px`, height: `${o}px` };
+      const { height: e, width: o } = this.viewer.navigator.element.getBoundingClientRect();
+      return { right: `${o}px`, height: `${e}px` };
     },
     handle_style() {
       return { bottom: `${100 * (this.zoom.current - this.zoom.min) / this.zoom.range}%` };
@@ -138,47 +173,47 @@ const h = /* @__PURE__ */ m(O, [["render", P]]), B = () => {
     dragstart() {
       this.box = this.$el.getBoundingClientRect(), this.start_zoom = this.viewer.viewport.getZoom();
     },
-    drag(o) {
-      const { xy_start: e, xy: t } = o._drag, s = (e[1] - t[1]) / this.box.height;
-      this.applyZoom(this.start_zoom + s * this.zoom.range);
+    drag(e) {
+      const { xy_start: o, xy: t } = e._drag, n = (o[1] - t[1]) / this.box.height;
+      this.applyZoom(this.start_zoom + n * this.zoom.range);
     },
-    applyZoom(o) {
-      this.viewer.viewport.zoomTo(R(o, this.zoom.min, this.zoom.max));
+    applyZoom(e) {
+      this.viewer.viewport.zoomTo(j(e, this.zoom.min, this.zoom.max));
     },
     nextZoom() {
-      const o = a.findIndex((e) => e > this.zoom.current);
-      this.applyZoom(a[o]);
+      const e = c.findIndex((o) => o > this.zoom.current);
+      this.applyZoom(c[e]);
     },
     prevZoom() {
-      const o = a.slice().reverse(), e = o.findIndex((t) => t < this.zoom.current);
-      this.applyZoom(o[e]);
+      const e = c.slice().reverse(), o = e.findIndex((t) => t < this.zoom.current);
+      this.applyZoom(e[o]);
     }
   }
-}, H = /* @__PURE__ */ b("div", { class: "osd-zoom-controls__track" }, null, -1);
-function N(o, e, t, s, r, n) {
-  const i = u("unrest-draggable");
-  return r.zoom ? (c(), _("div", {
+}, R = /* @__PURE__ */ y("div", { class: "osd-zoom-controls__track" }, null, -1);
+function N(e, o, t, n, s, r) {
+  const l = u("unrest-draggable");
+  return s.zoom ? (a(), m("div", {
     key: 0,
     class: "osd-zoom-controls",
-    style: d(n.wrapper_style)
+    style: h(r.wrapper_style)
   }, [
-    H,
-    z(i, {
+    R,
+    b(l, {
       class: "osd-zoom-controls__current",
-      style: d(n.handle_style),
-      onDragstart: n.dragstart,
-      onDrag: n.drag
+      style: h(r.handle_style),
+      onDragstart: r.dragstart,
+      onDrag: r.drag
     }, null, 8, ["style", "onDragstart", "onDrag"])
-  ], 4)) : y("", !0);
+  ], 4)) : z("", !0);
 }
-const p = /* @__PURE__ */ m(V, [["render", N]]), F = {
-  HtmlOverlay: h,
-  Store: B,
-  ZoomControls: p,
-  install(o) {
-    o.component("OsdHtmlOverlay", h), o.component("OsdZoomControls", p), o.component("OsdViewer", C);
+const _ = /* @__PURE__ */ d(E, [["render", N]]), X = {
+  HtmlOverlay: p,
+  Store: V,
+  ZoomControls: _,
+  install(e) {
+    e.component("OsdHtmlOverlay", p), e.component("OsdZoomControls", _), e.component("OsdViewer", S);
   }
 };
 export {
-  F as default
+  X as default
 };

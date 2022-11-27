@@ -11,5 +11,5 @@ export default {
     app.component('OsdHtmlOverlay', HtmlOverlay)
     app.component('OsdZoomControls', ZoomControls)
     app.component('OsdViewer', BaseViewer)
-  }
+  },
 }
