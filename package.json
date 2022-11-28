@@ -1,10 +1,13 @@
 {
   "name": "@unrest/vue-openseadragon",
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "https://github.com/chriscauley/unrest-vue-openseadragon",
   "author": "chriscauley",
-  "keywords": ["vue", "openseadragon"],
+  "keywords": [
+    "vue",
+    "openseadragon"
+  ],
   "files": [
     "dist"
   ],
