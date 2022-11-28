@@ -5,6 +5,11 @@
   "repository": "https://github.com/chriscauley/unrest-vue-openseadragon",
   "author": "chriscauley",
   "keywords": ["vue", "openseadragon"],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue-openseadragon.umd.js",
+  "module": "./dist/vue-openseadragon.es.js",
   "scripts": {
     "build": "vite build",
     "dev": "vite",

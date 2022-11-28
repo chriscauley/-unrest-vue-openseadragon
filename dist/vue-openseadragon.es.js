@@ -70,11 +70,11 @@ const k = /* @__PURE__ */ d($, [["render", C]]), B = {
         clickToZoom: !1,
         dblClickToZoom: !1
       }
-    } };
+    }, viewer: null };
   },
   watch: {
     editor_mode() {
-      const { viewer: e } = this.osd_store;
+      const { viewer: e } = this;
       e.setMouseNavEnabled(!this.editor_mode), e.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4;
     }
   },
@@ -82,7 +82,7 @@ const k = /* @__PURE__ */ d($, [["render", C]]), B = {
     osdWheel(e) {
       if (!this.editor_mode)
         return;
-      const o = this.osd_store.viewer, t = o.viewport;
+      const { viewer: o } = this, t = o.viewport;
       if (e.ctrlKey) {
         const n = o.container.getBoundingClientRect(), s = new i.Point(e.pageX - n.left, e.pageY - n.top), r = Math.pow(o.zoomPerScroll, -e.deltaY / 20);
         t.zoomBy(r, t.pointFromPixel(s, !0));
@@ -95,7 +95,8 @@ const k = /* @__PURE__ */ d($, [["render", C]]), B = {
       t.applyConstraints();
     },
     callback(e) {
-      this.osd_store.bindViewer(e), this.$emit("viewer-bound", e);
+      var o;
+      this.viewer = e, (o = this.osd_store) == null || o.bindViewer(e), this.$emit("viewer-bound", e);
     }
   }
 };
