@@ -1,5 +1,5 @@
-import i from "openseadragon";
-import { openBlock as a, createElementBlock as m, resolveComponent as u, createBlock as w, withModifiers as v, renderSlot as g, reactive as f, markRaw as x, normalizeStyle as h, createVNode as b, createCommentVNode as z, createElementVNode as y } from "vue";
+import r from "openseadragon";
+import { openBlock as a, createElementBlock as m, resolveComponent as _, createBlock as w, withModifiers as v, renderSlot as g, reactive as f, markRaw as x, normalizeStyle as p, createVNode as b, createCommentVNode as z, createElementVNode as y } from "vue";
 import Z from "@unrest/vue-mousetrap";
 const d = (e, o) => {
   const t = e.__vccOpts || e;
@@ -22,7 +22,7 @@ const d = (e, o) => {
   },
   mounted() {
     const { ...e } = this.options;
-    e.element = this.$el, window.viewer_jawn = this.viewer = new i(e);
+    e.element = this.$el, window.viewer_jawn = this.viewer = new r(e);
     const { viewport: o } = this.viewer;
     o.centerSpringY.animationTime = 0.25, o.centerSpringX.animationTime = 0.25, o.zoomSpring.animationTime = 0.25, this.bindEvents(), this.$emit("viewer-bound", this.viewer);
     const t = () => {
@@ -40,22 +40,22 @@ const d = (e, o) => {
     }
   }
 }, O = ["id"];
-function C(e, o, t, n, s, r) {
+function C(e, o, t, n, s, i) {
   return a(), m("div", {
     id: t.id,
     class: "osd-wrapper"
   }, null, 8, O);
 }
-const k = /* @__PURE__ */ d($, [["render", C]]), B = {
-  components: { OpenSeadragon: k },
+const E = /* @__PURE__ */ d($, [["render", C]]), M = {
+  components: { OpenSeadragon: E },
   props: {
     osd_store: Object,
-    editor_mode: Boolean
+    editor_mode: Boolean,
+    osd_options: Object
   },
   emits: ["viewer-bound"],
   data() {
-    const { editor_mode: e } = this;
-    return { osd_options: {
+    const { editor_mode: e } = this, o = {
       maxZoomPixelRatio: e ? 8 : 4,
       navigatorAutoFade: !1,
       showNavigator: !0,
@@ -65,30 +65,38 @@ const k = /* @__PURE__ */ d($, [["render", C]]), B = {
       showRotationControl: !1,
       debugmode: !1,
       clickTimeThreshold: 1e3,
-      mouseNavEnabled: !e,
       gestureSettingsMouse: {
         clickToZoom: !1,
         dblClickToZoom: !1
-      }
-    }, viewer: null };
+      },
+      ...this.osd_options
+    };
+    return o.mouseNavEnabled === void 0 && (o.mouseNavEnabled = !e), { prepped_osd_options: o, viewer: null };
   },
   watch: {
+    osd_options: {
+      deep: !0,
+      handler() {
+        this.viewer.setMouseNavEnabled(!!this.osd_options.mouseNavEnabled);
+      }
+    },
     editor_mode() {
-      const { viewer: e } = this;
-      e.setMouseNavEnabled(!this.editor_mode), e.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4;
+      var t, n;
+      const { viewer: e } = this, o = (n = (t = this.osd_options) == null ? void 0 : t.mouseNavEnabled) != null ? n : !0;
+      e.setMouseNavEnabled(!this.editor_mode && o), e.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4;
     }
   },
   methods: {
     osdWheel(e) {
-      if (!this.editor_mode)
+      if (!this.editor_mode || !this.osd_options.mouseNavEnabled)
         return;
       const { viewer: o } = this, t = o.viewport;
       if (e.ctrlKey) {
-        const n = o.container.getBoundingClientRect(), s = new i.Point(e.pageX - n.left, e.pageY - n.top), r = Math.pow(o.zoomPerScroll, -e.deltaY / 20);
-        t.zoomBy(r, t.pointFromPixel(s, !0));
+        const n = o.container.getBoundingClientRect(), s = new r.Point(e.pageX - n.left, e.pageY - n.top), i = Math.pow(o.zoomPerScroll, -e.deltaY / 20);
+        t.zoomBy(i, t.pointFromPixel(s, !0));
       } else {
         const n = t.pixelFromPoint(t.getCenter(!0)), s = t.pointFromPixel(
-          new i.Point(n.x + 3 * e.deltaX, n.y + 3 * e.deltaY)
+          new r.Point(n.x + 3 * e.deltaX, n.y + 3 * e.deltaY)
         );
         t.panTo(s, !1);
       }
@@ -100,29 +108,29 @@ const k = /* @__PURE__ */ d($, [["render", C]]), B = {
     }
   }
 };
-function M(e, o, t, n, s, r) {
-  const l = u("open-seadragon");
+function k(e, o, t, n, s, i) {
+  const l = _("open-seadragon");
   return a(), w(l, {
-    onMousewheel: v(r.osdWheel, ["prevent"]),
-    options: s.osd_options,
-    onViewerBound: r.callback,
+    onMousewheel: v(i.osdWheel, ["prevent"]),
+    options: s.prepped_osd_options,
+    onViewerBound: i.callback,
     pixelated: !0
   }, null, 8, ["onMousewheel", "options", "onViewerBound"]);
 }
-const S = /* @__PURE__ */ d(B, [["render", M]]), H = {
+const B = /* @__PURE__ */ d(M, [["render", k]]), S = {
   props: {
     viewer: Object
   },
   mounted() {
-    this.viewer.addOverlay(this.$el, new i.Rect(0, 0, 1, 1));
+    this.viewer.addOverlay(this.$el, new r.Rect(0, 0, 1, 1));
   }
-}, P = { class: "osd-html__overlay" };
-function T(e, o, t, n, s, r) {
-  return a(), m("div", P, [
+}, N = { class: "osd-html__overlay" };
+function j(e, o, t, n, s, i) {
+  return a(), m("div", N, [
     g(e.$slots, "default")
   ]);
 }
-const p = /* @__PURE__ */ d(H, [["render", T]]), V = () => {
+const h = /* @__PURE__ */ d(S, [["render", j]]), H = () => {
   const e = f({ _viewer: null });
   return {
     state: e,
@@ -137,7 +145,7 @@ const p = /* @__PURE__ */ d(H, [["render", T]]), V = () => {
       e._viewer = o, o.addHandler("zoom", () => e.zoom = o.viewport.getZoom());
     }
   };
-}, j = (e, o, t) => Math.min(t, Math.max(e, o)), c = [0, 0.5, 1, 2, 3, 4], E = {
+}, P = (e, o, t) => Math.min(t, Math.max(e, o)), c = [0, 0.5, 1, 2, 3, 4], T = {
   mixins: [Z.Mixin],
   props: {
     viewer: Object
@@ -179,7 +187,7 @@ const p = /* @__PURE__ */ d(H, [["render", T]]), V = () => {
       this.applyZoom(this.start_zoom + n * this.zoom.range);
     },
     applyZoom(e) {
-      this.viewer.viewport.zoomTo(j(e, this.zoom.min, this.zoom.max));
+      this.viewer.viewport.zoomTo(P(e, this.zoom.min, this.zoom.max));
     },
     nextZoom() {
       const e = c.findIndex((o) => o > this.zoom.current);
@@ -190,29 +198,29 @@ const p = /* @__PURE__ */ d(H, [["render", T]]), V = () => {
       this.applyZoom(e[o]);
     }
   }
-}, R = /* @__PURE__ */ y("div", { class: "osd-zoom-controls__track" }, null, -1);
-function N(e, o, t, n, s, r) {
-  const l = u("unrest-draggable");
+}, V = /* @__PURE__ */ y("div", { class: "osd-zoom-controls__track" }, null, -1);
+function R(e, o, t, n, s, i) {
+  const l = _("unrest-draggable");
   return s.zoom ? (a(), m("div", {
     key: 0,
     class: "osd-zoom-controls",
-    style: h(r.wrapper_style)
+    style: p(i.wrapper_style)
   }, [
-    R,
+    V,
     b(l, {
       class: "osd-zoom-controls__current",
-      style: h(r.handle_style),
-      onDragstart: r.dragstart,
-      onDrag: r.drag
+      style: p(i.handle_style),
+      onDragstart: i.dragstart,
+      onDrag: i.drag
     }, null, 8, ["style", "onDragstart", "onDrag"])
   ], 4)) : z("", !0);
 }
-const _ = /* @__PURE__ */ d(E, [["render", N]]), X = {
-  HtmlOverlay: p,
-  Store: V,
-  ZoomControls: _,
+const u = /* @__PURE__ */ d(T, [["render", R]]), X = {
+  HtmlOverlay: h,
+  Store: H,
+  ZoomControls: u,
   install(e) {
-    e.component("OsdHtmlOverlay", p), e.component("OsdZoomControls", _), e.component("OsdViewer", S);
+    e.component("OsdHtmlOverlay", h), e.component("OsdZoomControls", u), e.component("OsdViewer", B);
   }
 };
 export {

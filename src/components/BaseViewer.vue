@@ -1,7 +1,7 @@
 <template>
   <open-seadragon
     @mousewheel.prevent="osdWheel"
-    :options="osd_options"
+    :options="prepped_osd_options"
     @viewer-bound="callback"
     :pixelated="true"
   />
@@ -16,11 +16,12 @@ export default {
   props: {
     osd_store: Object,
     editor_mode: Boolean, // editor_mode is scroll to pan, ctrl+scroll to zoom (like figma)
+    osd_options: Object,
   },
   emits: ['viewer-bound'],
   data() {
     const { editor_mode } = this
-    const osd_options = {
+    const prepped_osd_options = {
       maxZoomPixelRatio: editor_mode ? 8 : 4,
       navigatorAutoFade: false,
       showNavigator: true,
@@ -30,24 +31,34 @@ export default {
       showRotationControl: false,
       debugmode: false,
       clickTimeThreshold: 1000,
-      mouseNavEnabled: !editor_mode,
       gestureSettingsMouse: {
         clickToZoom: false,
         dblClickToZoom: false,
       },
+      ...this.osd_options,
     }
-    return { osd_options, viewer: null }
+    if (prepped_osd_options.mouseNavEnabled === undefined) {
+      prepped_osd_options.mouseNavEnabled = !editor_mode
+    }
+    return { prepped_osd_options, viewer: null }
   },
   watch: {
+    osd_options: {
+      deep: true,
+      handler() {
+        this.viewer.setMouseNavEnabled(!!this.osd_options.mouseNavEnabled)
+      },
+    },
     editor_mode() {
       const { viewer } = this
-      viewer.setMouseNavEnabled(!this.editor_mode)
+      const enabled = this.osd_options?.mouseNavEnabled ?? true
+      viewer.setMouseNavEnabled(!this.editor_mode && enabled)
       viewer.viewport.maxZoomPixelRatio = this.editor_mode ? 8 : 4
     },
   },
   methods: {
     osdWheel(event) {
-      if (!this.editor_mode) {
+      if (!this.editor_mode || !this.osd_options.mouseNavEnabled) {
         return
       }
       // Loosely adapted from Openseadragon.Viewer's onCanvasDragEnd onCanvasScroll
